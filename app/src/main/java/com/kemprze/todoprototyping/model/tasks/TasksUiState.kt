@@ -2,6 +2,7 @@ package com.kemprze.todoprototyping.model.tasks
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kemprze.todoprototyping.data.model.DataSource
 import com.kemprze.todoprototyping.data.repository.TaskRepository
 import com.kemprze.todoprototyping.data.model.simpleTask
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -10,7 +11,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 data class TasksUiState(
-    val tasks: List<simpleTask> = emptyList(),
+    val tasks: List<simpleTask> = DataSource.sampleTaskList,
     val isLoading: Boolean = false
 )
 class TasksViewModel: ViewModel() {
