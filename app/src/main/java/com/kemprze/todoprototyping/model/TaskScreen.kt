@@ -65,7 +65,7 @@ fun TaskList(taskList: List<simpleTask>, modifier: Modifier = Modifier) {
         modifier = modifier
     ) {
         items(taskList) {
-            task -> TaskCard(name = task.taskName, description = task.taskDescription)
+            task -> TaskCard(name = task.taskName, description = task.taskDescription, dueDate = task.dueDate)
         }
     }
 }
