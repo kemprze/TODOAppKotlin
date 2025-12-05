@@ -9,4 +9,9 @@ class TaskRepository {
         delay(1000)
         return DataSource.sampleTaskList
     }
+
+    suspend fun getCompletedTasks(): List<simpleTask> {
+        delay(1000)
+        return DataSource.simpleCompletedTaskList
+    }
 }

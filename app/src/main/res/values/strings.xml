@@ -1,3 +1,22 @@
 <resources>
-    <string name="app_name">TODO prototyping</string>
+    <string name="category_work">Work</string>
+    <string name="category_personal">Personal</string>
+    <string name="category_shopping">Shopping</string>
+    <string name="category_health">Health</string>
+    <string name="category_home">Home</string>
+    <string name="category_education">Education</string>
+    <string name="category_finance">Finance</string>
+    <string name="category_other">Other</string>
+
+    <string name="icon_work">💼</string>
+    <string name="icon_personal">👤</string>
+    <string name="icon_shopping">🛒</string>
+    <string name="icon_health">❤️</string> <!-- Or 🏥, ❤️‍🩹 -->
+    <string name="icon_home">🏠</string>
+    <string name="icon_education">🎓</string>
+    <string name="icon_finance">💰</string>
+    <string name="icon_other">📋</string>
+    <string name="category_none" />
+    <string name="icon_none" />
+    <string name="app_name">TODO Prototyping</string>
 </resources>

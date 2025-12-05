@@ -35,7 +35,9 @@ fun TaskScreen(
         }
     ) { innerPadding ->
         TaskList(
-            taskList = taskUiState.tasks,
+            incompleteTasks = taskUiState.tasks,
+            completeTasks = taskUiState.completedTasks,
+            onTaskCompleted = { task, isCompleted -> tasksViewModel.onTaskCompleted(task, isCompleted)},
             modifier = modifier
                 .fillMaxSize()
                 .padding(innerPadding)
@@ -58,14 +60,14 @@ fun MainTaskScreenAppBar(modifier: Modifier = Modifier) {
     )
 }
 @Composable
-fun TaskList(taskList: List<simpleTask>, modifier: Modifier = Modifier) {
+fun TaskList(incompleteTasks: List<simpleTask>, completeTasks: List<simpleTask>, onTaskCompleted: (simpleTask, Boolean) -> Unit, modifier: Modifier = Modifier) {
     LazyColumn(
         verticalArrangement = Arrangement.spacedBy(8.dp),
         contentPadding = PaddingValues(horizontal = 8.dp, vertical = 8.dp),
         modifier = modifier
     ) {
-        items(taskList) {
-            task -> TaskCard(name = task.taskName, description = task.taskDescription, dueDate = task.dueDate)
+        items(incompleteTasks, key = {it.taskName}) {
+            task -> TaskCard(task = task, onTaskCompleted = onTaskCompleted)
         }
     }
 }

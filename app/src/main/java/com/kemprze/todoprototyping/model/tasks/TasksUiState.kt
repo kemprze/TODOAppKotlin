@@ -8,10 +8,12 @@ import com.kemprze.todoprototyping.data.model.simpleTask
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 data class TasksUiState(
     val tasks: List<simpleTask> = DataSource.sampleTaskList,
+    val completedTasks: List<simpleTask> = DataSource.simpleCompletedTaskList,
     val isLoading: Boolean = false
 )
 class TasksViewModel: ViewModel() {
@@ -28,7 +30,30 @@ class TasksViewModel: ViewModel() {
             _uiState.value = _uiState.value.copy(isLoading = true)
 
             val tasks = taskRepository.getTasks()
-            _uiState.value = TasksUiState(tasks = tasks, isLoading = false)
+            val completedTasks = taskRepository.getCompletedTasks()
+
+            _uiState.value = TasksUiState(tasks = tasks, completedTasks = completedTasks, isLoading = false)
         }
     }
+
+    fun onTaskCompleted(task: simpleTask, isCompleted: Boolean) {
+        _uiState.update { currentState ->
+            val sourceList = if (isCompleted) currentState.tasks else currentState.completedTasks
+            val targetList = if (isCompleted) currentState.completedTasks else currentState.tasks
+
+            val taskToMove = sourceList.find { it == task }
+            if (taskToMove != null) {
+                val newSource = sourceList - taskToMove
+                val newTarget = targetList + taskToMove.copy(isCompleted = isCompleted)
+
+                currentState.copy(
+                    tasks = if (isCompleted) newSource else newTarget,
+                    completedTasks = if (isCompleted) newTarget else newSource
+                )
+            } else {
+                currentState
+            }
+        }
+    }
+
 }
