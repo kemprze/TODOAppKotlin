@@ -9,7 +9,8 @@ data class simpleTask(
     var taskDescription: String,
     var isImportant: Boolean = false,
     var dueDate: LocalDate? = null,
-    var remindMe: Boolean = false,
+    var needsReminder: Boolean = false,
+    var remindMe: LocalDate? = null,
     var createdOn: LocalDate? = LocalDate.now(),
     var category: Category = Category.NONE,
     var isCompleted: Boolean = false

@@ -2,6 +2,7 @@ package com.kemprze.todoprototyping.model.tasks
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.kemprze.todoprototyping.data.model.Category
 import com.kemprze.todoprototyping.data.model.DataSource
 import com.kemprze.todoprototyping.data.repository.TaskRepository
 import com.kemprze.todoprototyping.data.model.simpleTask
@@ -10,6 +11,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 
 data class TasksUiState(
     val tasks: List<simpleTask> = DataSource.sampleTaskList,
@@ -33,6 +35,31 @@ class TasksViewModel: ViewModel() {
             val completedTasks = taskRepository.getCompletedTasks()
 
             _uiState.value = TasksUiState(tasks = tasks, completedTasks = completedTasks, isLoading = false)
+        }
+    }
+
+    fun onTaskAdded(taskName: String,
+                    taskDescription: String,
+                    isImportant: Boolean,
+                    dueDate: LocalDate?,
+                    needsReminder: Boolean,
+                    remindMe: LocalDate?,
+                    category: Category) {
+        val newTask = simpleTask(
+            taskName = taskName,
+            taskDescription = taskDescription,
+            isImportant = isImportant,
+            dueDate = dueDate,
+            remindMe = if (needsReminder) remindMe else null,
+            createdOn = LocalDate.now(),
+            category = category,
+            isCompleted = false,
+        )
+
+        _uiState.update { currentState ->
+            currentState.copy(
+                tasks = currentState.tasks + newTask
+            )
         }
     }
 

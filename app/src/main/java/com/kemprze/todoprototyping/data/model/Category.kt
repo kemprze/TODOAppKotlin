@@ -13,5 +13,5 @@ enum class Category(@StringRes val categoryNameRes: Int,
     HOME(categoryNameRes = R.string.category_home, categoryImageRes = R.string.icon_home),
     EDUCATION(categoryNameRes = R.string.category_education, categoryImageRes = R.string.icon_education),
     FINANCE(categoryNameRes = R.string.category_finance, categoryImageRes = R.string.icon_finance),
-    OTHER(categoryNameRes = R.string.category_other, categoryImageRes = R.string.category_other)
+    OTHER(categoryNameRes = R.string.category_other, categoryImageRes = R.string.icon_other)
 }
