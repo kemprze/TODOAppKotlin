@@ -1,13 +1,18 @@
 package com.kemprze.todoprototyping.data.model
 
-import androidx.annotation.DrawableRes
-import androidx.annotation.StringRes
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+import androidx.room.TypeConverters
 import java.time.LocalDate
+import java.util.UUID
 
+@Entity(tableName = "tasks")
+@TypeConverters(Converters::class)
 data class simpleTask(
+    @PrimaryKey var id: String = UUID.randomUUID().toString(),
     var taskName: String,
-    var taskDescription: String,
-    var isImportant: Boolean = false,
+    var taskDescription: String = "",
+    var priority: Priority = Priority.NORMAL,
     var dueDate: LocalDate? = null,
     var needsReminder: Boolean = false,
     var remindMe: LocalDate? = null,

@@ -26,6 +26,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kemprze.todoprototyping.data.model.Category
+import com.kemprze.todoprototyping.data.model.Priority
 import com.kemprze.todoprototyping.data.model.simpleTask
 import com.kemprze.todoprototyping.ui.theme.TODOPrototypingTheme
 import java.time.LocalDate
@@ -33,7 +34,11 @@ import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 
 @Composable
-fun DetailsRow(createdOn: LocalDate?, dueDate: LocalDate?, isImportant: Boolean, category: Category, modifier: Modifier = Modifier) {
+fun DetailsRow(createdOn: LocalDate?,
+               dueDate: LocalDate?,
+               priority: Priority,
+               category: Category,
+               modifier: Modifier = Modifier) {
     if (dueDate != null) {
         val formatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM)
         val formattedDataString = dueDate.format(formatter)
@@ -65,12 +70,11 @@ fun DetailsRow(createdOn: LocalDate?, dueDate: LocalDate?, isImportant: Boolean,
             style = MaterialTheme.typography.bodyMedium,
             modifier = Modifier.padding(top = 4.dp)
         )
-
-        if (isImportant != null) Text(
-            text = if (isImportant) "This is an important task" else "This is not an important task",
+        Text(
+            text = "${priority.emoji} ${priority.label}",
             style = MaterialTheme.typography.bodyMedium,
             modifier = Modifier.padding(top = 4.dp),
-            color = if (isImportant) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary
+            color = if (priority.level == 1) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary
         )
     }
 }
@@ -88,11 +92,16 @@ fun TaskCard(task: simpleTask, onTaskCompleted: (simpleTask, Boolean) -> Unit, m
                     modifier = Modifier.weight(6f))
                 TaskCheckbox(
                     modifier = Modifier.weight(1f),
-                    isImportant = task.isImportant,
+                    priority = task.priority,
                     checked = task.isCompleted,
                     onCheckedChange = { isChecked -> onTaskCompleted(task, isChecked) })
             }
-            if (details) DetailsRow(dueDate = task.dueDate, category = task.category, createdOn = task.createdOn, isImportant = task.isImportant)
+            if (details) DetailsRow(
+                dueDate = task.dueDate,
+                category = task.category,
+                createdOn = task.createdOn,
+                priority = task.priority
+            )
         }
 }
 
@@ -119,8 +128,13 @@ fun TaskNameDescription(name: String, description: String, category: Category, m
 }
 
 @Composable
-fun TaskCheckbox(modifier: Modifier = Modifier, isImportant: Boolean, checked: Boolean, onCheckedChange: (Boolean) -> Unit) {
-    var importantColorSchemeChange = if (isImportant) {
+fun TaskCheckbox(modifier: Modifier = Modifier,
+                 priority: Priority,
+                 checked: Boolean,
+                 onCheckedChange: (Boolean) -> Unit
+    )
+    {
+    val importantColorSchemeChange = if (priority.level == 1) {
         CheckboxDefaults.colors(
             checkedColor = MaterialTheme.colorScheme.error,
             uncheckedColor = MaterialTheme.colorScheme.error.copy(alpha = 0.6F)
@@ -152,7 +166,7 @@ fun TaskCardPreview() {
         dueDate = LocalDate.of(2025, 10, 2),
         category = Category.HOME,
         createdOn = LocalDate.of(2024, 10, 12),
-        isImportant = true,
+        priority = Priority.NORMAL,
         isCompleted = false
     )
     TODOPrototypingTheme {
@@ -172,7 +186,7 @@ fun TaskCardPreviewDark() {
         dueDate = LocalDate.of(2025, 10, 2),
         category = Category.HOME,
         createdOn = LocalDate.of(2024, 10, 12),
-        isImportant = true,
+        priority = Priority.NORMAL,
         isCompleted = false
     )
     TODOPrototypingTheme(darkTheme = true) {

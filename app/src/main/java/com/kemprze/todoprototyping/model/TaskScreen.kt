@@ -34,12 +34,14 @@ import com.kemprze.todoprototyping.model.tasks.TasksViewModel
 import com.kemprze.todoprototyping.ui.theme.TODOPrototypingTheme
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Settings
 
 @Composable
 fun TaskScreen(
         modifier: Modifier = Modifier,
         tasksViewModel: TasksViewModel = viewModel(),
-        onNavigateToAddTask: () -> Unit
+        onNavigateToAddTask: () -> Unit,
+        onNavigateToSettings: () -> Unit
 ) {
 
     val taskUiState by tasksViewModel.uiState.collectAsState()
@@ -48,7 +50,8 @@ fun TaskScreen(
     Scaffold(
         topBar = {
             MainTaskScreenAppBar(
-                onAddClick = onNavigateToAddTask
+                onAddClick = onNavigateToAddTask,
+                onSettingsClick = onNavigateToSettings
             )
         },
         bottomBar = { MainTaskScreenBottomAppBar(
@@ -72,7 +75,8 @@ fun TaskScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainTaskScreenAppBar(modifier: Modifier = Modifier, onAddClick: () -> Unit) {
+fun MainTaskScreenAppBar(modifier: Modifier = Modifier, onAddClick: () -> Unit,
+                         onSettingsClick: () -> Unit) {
     TopAppBar(
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer,
@@ -88,6 +92,14 @@ fun MainTaskScreenAppBar(modifier: Modifier = Modifier, onAddClick: () -> Unit) 
                 Icon(
                     imageVector = Icons.Default.Add,
                     contentDescription = "Add new task"
+                )
+            }
+            IconButton(
+                onClick = onSettingsClick
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Settings,
+                    contentDescription = "Settings"
                 )
             }
         },
@@ -141,7 +153,8 @@ fun TaskList(incompleteTasks: List<simpleTask>, completeTasks: List<simpleTask>,
 fun TaskListPreview() {
     TODOPrototypingTheme {
         TaskScreen(
-            onNavigateToAddTask = { }
+            onNavigateToAddTask = { },
+            onNavigateToSettings = { }
         )
     }
 }
@@ -152,7 +165,8 @@ fun TaskListPreview() {
 fun TaskListPreviewDark() {
     TODOPrototypingTheme(darkTheme = true) {
         TaskScreen(
-            onNavigateToAddTask = { }
+            onNavigateToAddTask = { },
+            onNavigateToSettings = { }
         )
     }
 }

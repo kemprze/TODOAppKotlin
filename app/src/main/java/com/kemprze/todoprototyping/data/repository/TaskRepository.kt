@@ -1,17 +1,19 @@
 package com.kemprze.todoprototyping.data.repository
 
-import com.kemprze.todoprototyping.data.model.DataSource
+import com.kemprze.todoprototyping.data.TaskDao
 import com.kemprze.todoprototyping.data.model.simpleTask
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
 
-class TaskRepository {
-    suspend fun getTasks(): List<simpleTask> {
-        delay(1000)
-        return DataSource.sampleTaskList
+class TaskRepository(private val taskDao: TaskDao) {
+     fun getTasks(): Flow<List<simpleTask>> {
+        return taskDao.getAllTasks()
     }
 
-    suspend fun getCompletedTasks(): List<simpleTask> {
-        delay(1000)
-        return DataSource.simpleCompletedTaskList
+    suspend fun insertTask(task: simpleTask) {
+        taskDao.insertTask(task)
+    }
+
+    suspend fun updateTask(task: simpleTask) {
+        taskDao.updateTask(task)
     }
 }
