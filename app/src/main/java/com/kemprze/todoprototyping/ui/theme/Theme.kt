@@ -331,21 +331,18 @@ fun TODOPrototypingTheme(
     dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
-    val colorScheme = when (appTheme) {
-        AppTheme.SYSTEM -> {
-            if (dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                val context = LocalContext.current
-                if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+    val colorScheme = if (dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            val context = LocalContext.current
+            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
             } else {
-                if (darkTheme) ScarletDarkColorScheme else ScarletLightColorScheme
+            when (appTheme) {
+                AppTheme.SYSTEM -> if (darkTheme) ScarletDarkColorScheme else ScarletLightColorScheme
+                AppTheme.SCARLET -> if (darkTheme) ScarletDarkColorScheme else ScarletLightColorScheme
+                AppTheme.MONSTERA -> if (darkTheme) MonsteraDarkColorScheme else MonsteraLightColorScheme
+                AppTheme.AMBER -> if (darkTheme) AmberDarkColorScheme else AmberLightColorScheme
+                AppTheme.INK_BLUE -> if (darkTheme) InkBlueDarkColorScheme else InkBlueLightColorScheme
             }
         }
-
-        AppTheme.SCARLET -> if (darkTheme) ScarletDarkColorScheme else ScarletLightColorScheme
-        AppTheme.MONSTERA -> if (darkTheme) MonsteraDarkColorScheme else MonsteraLightColorScheme
-        AppTheme.AMBER -> if (darkTheme) AmberDarkColorScheme else AmberLightColorScheme
-        AppTheme.INK_BLUE -> if (darkTheme) InkBlueDarkColorScheme else InkBlueLightColorScheme
-    }
 
     MaterialTheme(
         colorScheme = colorScheme,

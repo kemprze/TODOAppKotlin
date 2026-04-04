@@ -19,24 +19,18 @@ enum class AppFont {
 }
 
 val PlayfairFamily = FontFamily(
-    Font(R.font.playfair_display_variable, FontWeight.Normal),
-    Font(R.font.playfair_display_variable, FontWeight.Bold),
-    Font(R.font.playfair_display_italic_variable, FontWeight.Normal, FontStyle.Italic),
-    Font(R.font.playfair_display_italic_variable, FontWeight.Bold, FontStyle.Italic),
+    Font(R.font.playfair_display_variable),
+    Font(R.font.playfair_display_italic_variable, style = FontStyle.Italic),
 )
 
 val LoraFamily = FontFamily(
-    Font(R.font.lora_variable, FontWeight.Normal),
-    Font(R.font.lora_variable, FontWeight.Bold),
-    Font(R.font.lora_italic_variable, FontWeight.Normal, FontStyle.Italic),
-    Font(R.font.lora_italic_variable, FontWeight.Bold, FontStyle.Italic),
+    Font(R.font.lora_variable),
+    Font(R.font.lora_italic_variable, style = FontStyle.Italic),
 )
 
 val MontserratFamily = FontFamily(
-    Font(R.font.montserrat_variable, FontWeight.Normal),
-    Font(R.font.montserrat_variable, FontWeight.Bold),
-    Font(R.font.montserrat_italic_variable, FontWeight.Normal, FontStyle.Italic),
-    Font(R.font.montserrat_italic_variable, FontWeight.Bold, FontStyle.Italic),
+    Font(R.font.montserrat_variable),
+    Font(R.font.montserrat_italic_variable, style = FontStyle.Italic)
 )
 
 val LatoFamily = FontFamily(
@@ -71,22 +65,33 @@ fun typographyFor(font: AppFont): Typography {
     }
 
     return Typography(
-        displayLarge = TextStyle(fontFamily = family, fontWeight = FontWeight.Normal, fontSize = 57.sp, lineHeight = 64.sp, letterSpacing = (-0.25).sp),
-        displayMedium = TextStyle(fontFamily = family, fontWeight = FontWeight.Normal, fontSize = 45.sp, lineHeight = 52.sp, letterSpacing = 0.sp),
-        displaySmall = TextStyle(fontFamily = family, fontWeight = FontWeight.Normal, fontSize = 36.sp, lineHeight = 44.sp, letterSpacing = 0.sp),
-        headlineLarge = TextStyle(fontFamily = family, fontWeight = FontWeight.Normal, fontSize = 32.sp, lineHeight = 40.sp, letterSpacing = 0.sp),
-        headlineMedium = TextStyle(fontFamily = family, fontWeight = FontWeight.Normal, fontSize = 28.sp, lineHeight = 36.sp, letterSpacing = 0.sp),
-        headlineSmall = TextStyle(fontFamily = family, fontWeight = FontWeight.Normal, fontSize = 24.sp, lineHeight = 32.sp, letterSpacing = 0.sp),
-        titleLarge = TextStyle(fontFamily = family, fontWeight = FontWeight.Normal, fontSize = 22.sp, lineHeight = 28.sp, letterSpacing = 0.sp),
+        displayLarge = TextStyle(fontFamily = family, fontWeight = FontWeight.W600, fontSize = 57.sp, lineHeight = 64.sp, letterSpacing = (-0.25).sp),
+        displayMedium = TextStyle(fontFamily = family, fontWeight = FontWeight.W600, fontSize = 45.sp, lineHeight = 52.sp, letterSpacing = 0.sp),
+        displaySmall = TextStyle(fontFamily = family, fontWeight = FontWeight.W600, fontSize = 36.sp, lineHeight = 44.sp, letterSpacing = 0.sp),
+        headlineLarge = TextStyle(fontFamily = family, fontWeight = FontWeight.W600, fontSize = 32.sp, lineHeight = 40.sp, letterSpacing = 0.sp),
+        headlineMedium = TextStyle(fontFamily = family, fontWeight = FontWeight.W600, fontSize = 28.sp, lineHeight = 36.sp, letterSpacing = 0.sp),
+        headlineSmall = TextStyle(fontFamily = family, fontWeight = FontWeight.W600, fontSize = 24.sp, lineHeight = 32.sp, letterSpacing = 0.sp),
+        titleLarge = TextStyle(fontFamily = family, fontWeight = FontWeight.W600, fontSize = 22.sp, lineHeight = 28.sp, letterSpacing = 0.sp),
         titleMedium = TextStyle(fontFamily = family, fontWeight = FontWeight.Bold, fontSize = 16.sp, lineHeight = 24.sp, letterSpacing = 0.15.sp),
         titleSmall = TextStyle(fontFamily = family, fontWeight = FontWeight.Bold, fontSize = 14.sp, lineHeight = 20.sp, letterSpacing = 0.1.sp),
-        bodyLarge = TextStyle(fontFamily = family, fontWeight = FontWeight.Normal, fontSize = 16.sp, lineHeight = 24.sp, letterSpacing = 0.5.sp),
-        bodyMedium = TextStyle(fontFamily = family, fontWeight = FontWeight.Normal, fontSize = 14.sp, lineHeight = 20.sp, letterSpacing = 0.25.sp),
-        bodySmall = TextStyle(fontFamily = family, fontWeight = FontWeight.Normal, fontSize = 12.sp, lineHeight = 16.sp, letterSpacing = 0.4.sp),
+        bodyLarge = TextStyle(fontFamily = family, fontWeight = FontWeight.W600, fontSize = 16.sp, lineHeight = 24.sp, letterSpacing = 0.5.sp),
+        bodyMedium = TextStyle(fontFamily = family, fontWeight = FontWeight.W600, fontSize = 14.sp, lineHeight = 20.sp, letterSpacing = 0.25.sp),
+        bodySmall = TextStyle(fontFamily = family, fontWeight = FontWeight.W600, fontSize = 12.sp, lineHeight = 16.sp, letterSpacing = 0.4.sp),
         labelLarge = TextStyle(fontFamily = family, fontWeight = FontWeight.Bold, fontSize = 14.sp, lineHeight = 20.sp, letterSpacing = 0.1.sp),
         labelMedium = TextStyle(fontFamily = family, fontWeight = FontWeight.Bold, fontSize = 12.sp, lineHeight = 16.sp, letterSpacing = 0.5.sp),
         labelSmall = TextStyle(fontFamily = family, fontWeight = FontWeight.Bold, fontSize = 11.sp, lineHeight = 16.sp, letterSpacing = 0.5.sp),
     )
 }
 
-val Typography = typographyFor(AppFont.LATO)
+fun fontFamilyFor(font: AppFont): FontFamily {
+    return when (font) {
+        AppFont.PLAYFAIR -> PlayfairFamily
+        AppFont.LORA -> LoraFamily
+        AppFont.MONTSERRAT -> MontserratFamily
+        AppFont.LATO -> LatoFamily
+        AppFont.ATKINSON -> AtkinsonFamily
+        AppFont.COURIER_PRIME -> CourierPrimeFamily
+    }
+}
+
+val Typography = typographyFor(AppFont.MONTSERRAT)
