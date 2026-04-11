@@ -3,18 +3,28 @@ package com.kemprze.todoprototyping.model
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Card
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SwipeToDismissBox
+import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -80,16 +90,53 @@ fun DetailsRow(createdOn: LocalDate?,
 }
 
 @Composable
-fun TaskCard(task: simpleTask, onTaskCompleted: (simpleTask, Boolean) -> Unit, modifier: Modifier = Modifier) {
+fun TaskCard(task: simpleTask,
+             onTaskCompleted: (simpleTask, Boolean) -> Unit,
+             onTaskDeleted: (simpleTask) -> Unit,
+             modifier: Modifier = Modifier) {
     var details by remember { mutableStateOf(false) }
+    val dismissState = rememberSwipeToDismissBoxState(
+        positionalThreshold = { totalDistance -> totalDistance * 0.75f },
+        confirmValueChange = { it == SwipeToDismissBoxValue.EndToStart }
+    )
 
-        Card(onClick = {details = !details}) {
-            Row(verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(8.dp)) {
-                TaskNameDescription(name = task.taskName,
+    LaunchedEffect(dismissState.currentValue) {
+        if (dismissState.currentValue == SwipeToDismissBoxValue.EndToStart) {
+            onTaskDeleted(task)
+        }
+    }
+
+    SwipeToDismissBox(
+        state = dismissState,
+        enableDismissFromStartToEnd = false,
+        backgroundContent = {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.errorContainer)
+                    .padding(end = 16.dp),
+                contentAlignment = Alignment.CenterEnd
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Delete,
+                    contentDescription = "Delete",
+                    tint = MaterialTheme.colorScheme.onErrorContainer
+                )
+            }
+
+        }
+    ) {
+        Card(onClick = { details = !details }) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(8.dp)
+            ) {
+                TaskNameDescription(
+                    name = task.taskName,
                     description = task.taskDescription,
                     category = task.category,
-                    modifier = Modifier.weight(6f))
+                    modifier = Modifier.weight(6f)
+                )
                 TaskCheckbox(
                     modifier = Modifier.weight(1f),
                     priority = task.priority,
@@ -103,6 +150,7 @@ fun TaskCard(task: simpleTask, onTaskCompleted: (simpleTask, Boolean) -> Unit, m
                 priority = task.priority
             )
         }
+    }
 }
 
 @Composable
@@ -172,7 +220,8 @@ fun TaskCardPreview() {
     TODOPrototypingTheme {
         TaskCard(
                 sampleTask,
-        onTaskCompleted = {_, _ -> }
+        onTaskCompleted = {_, _ -> },
+            onTaskDeleted = { }
         )
     }
 }
@@ -192,7 +241,8 @@ fun TaskCardPreviewDark() {
     TODOPrototypingTheme(darkTheme = true) {
         TaskCard(
             sampleTask,
-            onTaskCompleted = {_, _ -> }
+            onTaskCompleted = {_, _ -> },
+            onTaskDeleted = {}
         )
     }
     }

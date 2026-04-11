@@ -1,4 +1,5 @@
 package com.kemprze.todoprototyping.model
+import android.R.attr.text
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -35,6 +36,10 @@ import com.kemprze.todoprototyping.ui.theme.TODOPrototypingTheme
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.SegmentedButton
+import androidx.compose.material3.SegmentedButtonDefaults
+import androidx.compose.material3.SingleChoiceSegmentedButtonRow
+import com.kemprze.todoprototyping.data.DarkModePreferences
 
 @Composable
 fun TaskScreen(
@@ -57,7 +62,8 @@ fun TaskScreen(
         bottomBar = { MainTaskScreenBottomAppBar(
             onListTypeChange = {
                     newListType -> currentList = newListType
-                }
+                },
+            currentList = currentList
             )
         }
     ) { innerPadding ->
@@ -66,6 +72,7 @@ fun TaskScreen(
             incompleteTasks = taskUiState.tasks,
             completeTasks = taskUiState.completedTasks,
             onTaskCompleted = { task, isCompleted -> tasksViewModel.onTaskCompleted(task, isCompleted)},
+            onTaskDeleted = { task -> tasksViewModel.onTaskDeleted(task) },
             modifier = modifier
                 .fillMaxSize()
                 .padding(innerPadding)
@@ -108,29 +115,37 @@ fun MainTaskScreenAppBar(modifier: Modifier = Modifier, onAddClick: () -> Unit,
 }
 
 @Composable
-fun MainTaskScreenBottomAppBar(onListTypeChange: (ListTypes) -> Unit, modifier: Modifier = Modifier) {
+fun MainTaskScreenBottomAppBar(onListTypeChange: (ListTypes) -> Unit,
+                               currentList: ListTypes,
+                               modifier: Modifier = Modifier) {
     BottomAppBar(modifier) {
         Row(
             modifier = Modifier.fillMaxSize(),
             horizontalArrangement = Arrangement.SpaceAround,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Button(onClick = { onListTypeChange(ListTypes.INCOMPLETE) }) {
-                Text(
-                    text = "Incomplete"
-                )
-            }
-            Button(onClick = { onListTypeChange(ListTypes.COMPLETE) }) {
-                Text(
-                    text = "Done"
-                )
+            SingleChoiceSegmentedButtonRow() {
+                ListTypes.entries.forEachIndexed { index, listType ->
+                    SegmentedButton(
+                        selected = listType == currentList,
+                        onClick = { onListTypeChange(listType) },
+                        shape = SegmentedButtonDefaults.itemShape(index, ListTypes.entries.size),
+                        icon = {},
+                        label = { Text(listType.name.lowercase().replaceFirstChar { it.titlecase() }) }
+                    )
+                }
             }
         }
     }
 }
 
 @Composable
-fun TaskList(incompleteTasks: List<simpleTask>, completeTasks: List<simpleTask>, currentListType: ListTypes, onTaskCompleted: (simpleTask, Boolean) -> Unit, modifier: Modifier = Modifier) {
+fun TaskList(incompleteTasks: List<simpleTask>,
+             completeTasks: List<simpleTask>,
+             currentListType: ListTypes,
+             onTaskCompleted: (simpleTask, Boolean) -> Unit,
+             onTaskDeleted: (simpleTask) -> Unit,
+             modifier: Modifier = Modifier) {
 
     val currentListItems = when (currentListType) {
         ListTypes.INCOMPLETE -> incompleteTasks
@@ -142,8 +157,11 @@ fun TaskList(incompleteTasks: List<simpleTask>, completeTasks: List<simpleTask>,
         contentPadding = PaddingValues(dimensionResource(R.dimen.padding_medium)),
         modifier = modifier
     ) {
-        items(currentListItems, key = {it.taskName}) {
-            task -> TaskCard(task = task, onTaskCompleted = onTaskCompleted)
+        items(currentListItems, key = {it.id}) {
+            task -> TaskCard(task = task,
+            onTaskCompleted = onTaskCompleted,
+            onTaskDeleted = onTaskDeleted,
+                modifier = Modifier.animateItem())
         }
     }
 }

@@ -28,6 +28,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Slider
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
@@ -36,6 +37,7 @@ import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -47,6 +49,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kemprze.todoprototyping.data.model.Category
+import com.kemprze.todoprototyping.data.model.Duration
 import com.kemprze.todoprototyping.data.model.Priority
 import com.kemprze.todoprototyping.data.model.simpleTask
 import com.kemprze.todoprototyping.ui.theme.TODOPrototypingTheme
@@ -60,14 +63,15 @@ fun AddTaskWizard(
     onNavigateBack: () -> Unit,
     onAddClick: (simpleTask) -> Unit
 ) {
-    val pageCount = 4
-    val pagerState = rememberPagerState(initialPage = 0, pageCount = { 4 })
+    val pageCount = 5
+    val pagerState = rememberPagerState(initialPage = 0, pageCount = { 5 })
     var taskName by rememberSaveable { mutableStateOf("") }
     var taskDescription by rememberSaveable { mutableStateOf("")}
     var priority by rememberSaveable { mutableStateOf(Priority.NORMAL) }
     var category by rememberSaveable { mutableStateOf(Category.NONE) }
     var dueDate by rememberSaveable { mutableStateOf<Long?>(null) }
     var needsReminder by rememberSaveable { mutableStateOf(false) }
+    var duration by rememberSaveable { mutableIntStateOf(0) }
     val scope = rememberCoroutineScope()
 
     Scaffold(modifier) { innerPadding ->
@@ -104,7 +108,11 @@ fun AddTaskWizard(
                         needsReminder = needsReminder,
                         onReminderChange = { needsReminder = it }
                     )
-                    3 -> WizardStepImportance(
+                    3 -> WizardStepDuration(
+                        duration = duration,
+                        onDurationChange = { duration = it }
+                    )
+                    4 -> WizardStepImportance(
                         priority = priority,
                         onPriorityChange = { priority = it }
                     )
@@ -164,7 +172,8 @@ fun AddTaskWizard(
                                     .atZone(ZoneId.systemDefault())
                                     .toLocalDate()
                             },
-                            needsReminder = needsReminder
+                            needsReminder = needsReminder,
+                            duration = Duration.fromMinutes(duration)
                         )
                         onAddClick(newTask)
                     }
@@ -370,6 +379,48 @@ fun WizardStepWhen(
 }
 
 @Composable
+fun WizardStepDuration(
+    duration: Int,
+    onDurationChange: (Int) -> Unit
+) {
+    Column(modifier = Modifier.fillMaxSize()) {
+        Box(
+            modifier = Modifier
+                .weight(0.8f)
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.primary),
+            contentAlignment = Alignment.BottomEnd
+        ) {
+            Text(
+                text = "How long will\nthis take?",
+                style = MaterialTheme.typography.headlineLarge,
+                color = MaterialTheme.colorScheme.onPrimary,
+                modifier = Modifier.padding(36.dp)
+            )
+        }
+        Box(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.background),
+            contentAlignment = Alignment.TopStart
+        ) {
+            Column(
+                modifier = Modifier.padding(32.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Text(text = Duration.fromMinutes(duration).label)
+                Slider(
+                    value = duration.toFloat(),
+                    onValueChange = { onDurationChange(it.toInt()) },
+                    valueRange = 0f..60f
+                )
+            }
+        }
+    }
+}
+
+@Composable
 fun WizardStepImportance(
     priority: Priority,
     onPriorityChange: (Priority) -> Unit
@@ -424,13 +475,5 @@ fun WizardStepImportance(
                 }
             }
         }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun AddTaskWizardPreview() {
-    TODOPrototypingTheme {
-        AddTaskWizard(onNavigateBack = {}, onAddClick = {})
     }
 }

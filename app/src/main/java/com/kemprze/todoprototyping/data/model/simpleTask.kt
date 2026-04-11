@@ -18,5 +18,6 @@ data class simpleTask(
     var remindMe: LocalDate? = null,
     var createdOn: LocalDate? = LocalDate.now(),
     var category: Category = Category.NONE,
-    var isCompleted: Boolean = false
+    var isCompleted: Boolean = false,
+    var duration: Duration = Duration.MEDIUM
 )

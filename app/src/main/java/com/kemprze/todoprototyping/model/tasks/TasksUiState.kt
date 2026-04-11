@@ -69,4 +69,10 @@ class TasksViewModel(private val taskRepository: TaskRepository): ViewModel() {
         }
     }
 
+    fun onTaskDeleted(task: simpleTask) {
+        viewModelScope.launch {
+            taskRepository.deleteTask(task)
+        }
+    }
+
 }

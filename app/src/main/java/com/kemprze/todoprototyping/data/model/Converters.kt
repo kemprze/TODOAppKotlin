@@ -33,4 +33,14 @@ class Converters {
     fun intToPriority(value: Int): Priority {
         return Priority.entries.first { it.level == value }
     }
+
+    @TypeConverter
+    fun durationToInt(duration: Duration): Int {
+        return duration.ordinal
+    }
+
+    @TypeConverter
+    fun intToDuration(value: Int): Duration {
+        return Duration.entries.first { it.ordinal == value}
+    }
 }
