@@ -1,9 +1,13 @@
 package com.kemprze.todoprototyping.model.tasks
 
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kemprze.todoprototyping.data.model.Category
+import com.kemprze.todoprototyping.data.model.Duration
 import com.kemprze.todoprototyping.data.model.Priority
+import com.kemprze.todoprototyping.data.model.ReminderWorker
 import com.kemprze.todoprototyping.data.repository.TaskRepository
 import com.kemprze.todoprototyping.data.model.simpleTask
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -12,13 +16,15 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.LocalDate
+import java.time.LocalDateTime
 
 data class TasksUiState(
     val tasks: List<simpleTask> = emptyList(),
     val completedTasks: List<simpleTask> = emptyList(),
     val isLoading: Boolean = false
 )
-class TasksViewModel(private val taskRepository: TaskRepository): ViewModel() {
+class TasksViewModel(private val taskRepository: TaskRepository,
+                     application: Application): AndroidViewModel(application) {
     private val _uiState = MutableStateFlow(TasksUiState())
     val uiState: StateFlow<TasksUiState> = _uiState.asStateFlow()
 
@@ -43,23 +49,45 @@ class TasksViewModel(private val taskRepository: TaskRepository): ViewModel() {
     fun onTaskAdded(taskName: String,
                     taskDescription: String,
                     priority: Priority,
-                    dueDate: LocalDate?,
+                    dueDate: LocalDateTime?,
                     needsReminder: Boolean,
-                    remindMe: LocalDate?,
-                    category: Category) {
+                    remindMe: LocalDateTime?,
+                    category: Category,
+                    duration: Duration) {
         val newTask = simpleTask(
             taskName = taskName,
             taskDescription = taskDescription,
             priority = priority,
             dueDate = dueDate,
             remindMe = if (needsReminder) remindMe else null,
-            createdOn = LocalDate.now(),
+            createdOn = LocalDateTime.now(),
             category = category,
             isCompleted = false,
+            duration = duration
         )
 
         viewModelScope.launch {
             taskRepository.insertTask(newTask)
+
+            if (needsReminder && newTask.remindMe != null) {
+                val delay = java.time.temporal.ChronoUnit.MILLIS.between(
+                    LocalDateTime.now(),
+                    newTask.remindMe
+                )
+
+                val inputData = androidx.work.Data.Builder()
+                    .putString("task_name", newTask.taskName)
+                    .putString("task_id", newTask.id)
+                    .build()
+
+                val workRequest = androidx.work.OneTimeWorkRequestBuilder<ReminderWorker>()
+                    .setInitialDelay(delay, java.util.concurrent.TimeUnit.MILLISECONDS)
+                    .setInputData(inputData)
+                    .build()
+
+                androidx.work.WorkManager.getInstance(getApplication<Application>())
+                    .enqueue(workRequest)
+            }
         }
     }
 

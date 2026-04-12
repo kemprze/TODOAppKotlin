@@ -3,7 +3,7 @@ package com.kemprze.todoprototyping.data.model
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
-import java.time.LocalDate
+import java.time.LocalDateTime
 import java.util.UUID
 
 @Entity(tableName = "tasks")
@@ -13,10 +13,11 @@ data class simpleTask(
     var taskName: String,
     var taskDescription: String = "",
     var priority: Priority = Priority.NORMAL,
-    var dueDate: LocalDate? = null,
+    var dueDate: LocalDateTime? = null,
     var needsReminder: Boolean = false,
-    var remindMe: LocalDate? = null,
-    var createdOn: LocalDate? = LocalDate.now(),
+    var remindMe: LocalDateTime? = null,
+    var reminderOffset: ReminderOffset? = null,
+    var createdOn: LocalDateTime? = LocalDateTime.now(),
     var category: Category = Category.NONE,
     var isCompleted: Boolean = false,
     var duration: Duration = Duration.MEDIUM

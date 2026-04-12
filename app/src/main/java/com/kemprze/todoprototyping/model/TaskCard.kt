@@ -40,12 +40,13 @@ import com.kemprze.todoprototyping.data.model.Priority
 import com.kemprze.todoprototyping.data.model.simpleTask
 import com.kemprze.todoprototyping.ui.theme.TODOPrototypingTheme
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 
 @Composable
-fun DetailsRow(createdOn: LocalDate?,
-               dueDate: LocalDate?,
+fun DetailsRow(createdOn: LocalDateTime?,
+               dueDate: LocalDateTime?,
                priority: Priority,
                category: Category,
                modifier: Modifier = Modifier) {
@@ -211,9 +212,9 @@ fun TaskCardPreview() {
     val sampleTask = simpleTask(
         taskName = "Throw trash out",
         taskDescription = "The trashcan is overflowing",
-        dueDate = LocalDate.of(2025, 10, 2),
+        dueDate = LocalDateTime.of(2025, 12, 1, 12, 42),
         category = Category.HOME,
-        createdOn = LocalDate.of(2024, 10, 12),
+        createdOn = LocalDateTime.of(2024, 10, 12, 12, 47),
         priority = Priority.NORMAL,
         isCompleted = false
     )
@@ -232,9 +233,9 @@ fun TaskCardPreviewDark() {
     val sampleTask = simpleTask(
         taskName = "Throw trash out",
         taskDescription = "The trashcan is overflowing",
-        dueDate = LocalDate.of(2025, 10, 2),
+        dueDate = LocalDateTime.of(2025, 12, 1, 12, 42),
         category = Category.HOME,
-        createdOn = LocalDate.of(2024, 10, 12),
+        createdOn = LocalDateTime.of(2024, 10, 12, 12, 47),
         priority = Priority.NORMAL,
         isCompleted = false
     )

@@ -1,5 +1,8 @@
 package com.kemprze.todoprototyping
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -35,6 +38,17 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(
+                "task_reminders",
+                "Task Reminders",
+                NotificationManager.IMPORTANCE_DEFAULT
+            ).apply {
+                description = "Reminders for your scheduled tasks"
+            }
+            val notificationManager = getSystemService(NotificationManager::class.java)
+            notificationManager.createNotificationChannel(channel)
+        }
         setContent {
             val settingsViewModel: SettingsViewModel = viewModel()
             val appTheme by settingsViewModel.themeFlow.collectAsState(initial = AppTheme.SCARLET)
@@ -98,7 +112,8 @@ fun AppNavigation(modifier: Modifier = Modifier,
                         dueDate = task.dueDate,
                         needsReminder = task.needsReminder,
                         remindMe = task.remindMe,
-                        category = task.category
+                        category = task.category,
+                        duration = task.duration
                     )
                     navController.navigateUp()
                 })

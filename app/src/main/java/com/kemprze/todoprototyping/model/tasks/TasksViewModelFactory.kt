@@ -1,5 +1,6 @@
 package com.kemprze.todoprototyping.model.tasks
 
+import android.app.Application
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -12,7 +13,7 @@ class TasksViewModelFactory(private val context: Context): ViewModelProvider.Fac
         val repository = TaskRepository(database.taskDao())
 
         @Suppress("UNCHECKED_CAST")
-        return TasksViewModel(repository) as T
+        return TasksViewModel(repository, context.applicationContext as Application) as T
     }
 
 }

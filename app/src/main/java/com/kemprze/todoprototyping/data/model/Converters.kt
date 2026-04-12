@@ -2,16 +2,18 @@ package com.kemprze.todoprototyping.data.model
 
 import androidx.room.TypeConverter
 import java.time.LocalDate
+import java.time.LocalDateTime
+
 class Converters {
 
     @TypeConverter
-    fun localDateToString(date: LocalDate?): String? {
+    fun localDateToString(date: LocalDateTime?): String? {
         return date?.toString()
     }
 
     @TypeConverter
-    fun stringToLocalDate(value: String?): LocalDate? {
-        return value?.let { LocalDate.parse(it)}
+    fun stringToLocalDate(value: String?): LocalDateTime? {
+        return value?.let { LocalDateTime.parse(it) }
     }
 
     @TypeConverter
@@ -42,5 +44,15 @@ class Converters {
     @TypeConverter
     fun intToDuration(value: Int): Duration {
         return Duration.entries.first { it.ordinal == value}
+    }
+
+    @TypeConverter
+    fun reminderOffsetToInt(offset: ReminderOffset?): Int? {
+        return offset?.ordinal
+    }
+
+    @TypeConverter
+    fun intToReminderOffset(value: Int?): ReminderOffset? {
+        return value?.let { ReminderOffset.entries[it] }
     }
 }

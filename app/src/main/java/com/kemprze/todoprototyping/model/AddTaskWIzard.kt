@@ -1,5 +1,9 @@
 package com.kemprze.todoprototyping.model
 
+import android.Manifest
+import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -46,13 +50,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.kemprze.todoprototyping.data.model.Category
 import com.kemprze.todoprototyping.data.model.Duration
 import com.kemprze.todoprototyping.data.model.Priority
+import com.kemprze.todoprototyping.data.model.ReminderOffset
 import com.kemprze.todoprototyping.data.model.simpleTask
-import com.kemprze.todoprototyping.ui.theme.TODOPrototypingTheme
 import kotlinx.coroutines.launch
 import java.time.Instant
 import java.time.ZoneId
@@ -72,6 +75,8 @@ fun AddTaskWizard(
     var dueDate by rememberSaveable { mutableStateOf<Long?>(null) }
     var needsReminder by rememberSaveable { mutableStateOf(false) }
     var duration by rememberSaveable { mutableIntStateOf(0) }
+    var reminderOffset by rememberSaveable {
+        mutableStateOf<ReminderOffset?>(null) }
     val scope = rememberCoroutineScope()
 
     Scaffold(modifier) { innerPadding ->
@@ -106,7 +111,9 @@ fun AddTaskWizard(
                         dueDateMillis = dueDate,
                         onDateSelected = { dueDate = it },
                         needsReminder = needsReminder,
-                        onReminderChange = { needsReminder = it }
+                        onReminderChange = { needsReminder = it },
+                        selectedOffset = reminderOffset,
+                        onOffsetSelected = { reminderOffset = it }
                     )
                     3 -> WizardStepDuration(
                         duration = duration,
@@ -170,9 +177,15 @@ fun AddTaskWizard(
                             dueDate = dueDate?.let {
                                 Instant.ofEpochMilli(it)
                                     .atZone(ZoneId.systemDefault())
-                                    .toLocalDate()
+                                    .toLocalDateTime()
                             },
                             needsReminder = needsReminder,
+                            remindMe = dueDate?.let { millis ->
+                                val due = Instant.ofEpochMilli(millis)
+                                    .atZone(ZoneId.systemDefault())
+                                    .toLocalDateTime()
+                                reminderOffset?.calculateReminderTime(due)
+                            },
                             duration = Duration.fromMinutes(duration)
                         )
                         onAddClick(newTask)
@@ -301,9 +314,18 @@ fun WizardStepWhen(
     dueDateMillis: Long?,
     onDateSelected: (Long?) -> Unit,
     needsReminder: Boolean,
-    onReminderChange: (Boolean) -> Unit
+    onReminderChange: (Boolean) -> Unit,
+    selectedOffset: ReminderOffset?,
+    onOffsetSelected: (ReminderOffset) -> Unit
 ) {
     val datePickerState = rememberDatePickerState()
+    val permissionLauncher = rememberLauncherForActivityResult(contract = ActivityResultContracts.RequestPermission(),
+        onResult = { isGranted ->
+            if (isGranted) {
+
+            }
+        })
+
     LaunchedEffect(
         datePickerState.selectedDateMillis
     ) {
@@ -322,7 +344,7 @@ fun WizardStepWhen(
                 text = "When do you need\nto do this?",
                 style = MaterialTheme.typography.headlineLarge,
                 color = MaterialTheme.colorScheme.onBackground,
-                modifier = Modifier.padding(32.dp)
+                modifier = Modifier.padding(28.dp)
             )
         }
 
@@ -331,10 +353,13 @@ fun WizardStepWhen(
                 .weight(1.6f)
                 .fillMaxWidth()
                 .background(MaterialTheme.colorScheme.primary)
-                .padding(horizontal = 16.dp)
+                .padding(horizontal = 12.dp)
         ) {
             DatePicker(
+                modifier = Modifier.padding(top = 24.dp),
                 state = datePickerState,
+                title = null,
+                headline = null,
                 colors = DatePickerDefaults.colors(
                     containerColor = Color.Transparent,
                     titleContentColor = MaterialTheme.colorScheme.onPrimary,
@@ -364,7 +389,14 @@ fun WizardStepWhen(
                 )
                 Switch(
                     checked = needsReminder,
-                    onCheckedChange = onReminderChange,
+                    onCheckedChange = { isChecked ->
+                        if (isChecked) {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                                permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                            }
+                        }
+                        onReminderChange(isChecked)
+                    },
                     colors = SwitchDefaults.colors(
                         checkedThumbColor = MaterialTheme.colorScheme.primary,
                         checkedTrackColor = MaterialTheme.colorScheme.onPrimary,
@@ -373,6 +405,32 @@ fun WizardStepWhen(
                         uncheckedBorderColor = MaterialTheme.colorScheme.onPrimary
                     )
                 )
+            }
+            if (needsReminder) {
+                LazyRow(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                ) {
+                    items(ReminderOffset.entries) {
+                            offset ->
+                        FilterChip(
+                            selected = selectedOffset == offset,
+                            onClick = { onOffsetSelected(offset) },
+                            label = { Text(offset.label) },
+                            colors = FilterChipDefaults.filterChipColors(
+                                labelColor = MaterialTheme.colorScheme.onPrimary,
+                                selectedContainerColor = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.2f),
+                                selectedLabelColor = MaterialTheme.colorScheme.onPrimary
+                            ),
+                            border = FilterChipDefaults.filterChipBorder(
+                                enabled = true,
+                                selected = selectedOffset == offset,
+                                borderColor = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.5f),
+                                selectedBorderColor = MaterialTheme.colorScheme.onPrimary
+                            )
+                        )
+                    }
+                }
             }
         }
     }

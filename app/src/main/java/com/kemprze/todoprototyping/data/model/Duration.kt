@@ -7,7 +7,6 @@ enum class Duration(val label: String, val maxMinutes: Int) {
     LONG("Long", 120),
     DEEP("Deep work", Int.MAX_VALUE);
 
-
     companion object {
         fun fromMinutes(minutes: Int): Duration {
             return entries.firstOrNull { minutes <= it.maxMinutes } ?: Duration.DEEP
